@@ -14,32 +14,35 @@ def main():
     classifier.load_weights('classifier_weights.h5')
     classifier.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-    results = []
     times = []
-    path = 'data/test_set/cats/'
-    for imgFile in os.listdir(path):
-        if imgFile.endswith('.jpg'):
-
-            imgPath = os.path.join(path, imgFile)
-            start = time.time()
-            test_image = image.load_img(imgPath, target_size=(64, 64))
-            test_image = image.img_to_array(test_image)
-            test_image = np.expand_dims(test_image, axis=0)
-            result = classifier.predict_classes(test_image)
-            end = time.time()
-
-            times.append((end - start) * 1000)
-            results.append(result[0][0])
-
+    path = 'data/test_set/'
     correctGuesses = 0
-    for result in results:
-        if result == 1:
-            correctGuesses += 1
-    accuracy = correctGuesses / len(results) * 100
-    print('Accuracy: %3.2f%%' % accuracy)
+    numGuesses = 0
+    for root, dirs, files in os.walk(path):
+        for imgFile in files:
+            if imgFile.endswith('.jpg'):
+
+                imgPath = os.path.join(root, imgFile)
+                start = time.time()
+                test_image = image.load_img(imgPath, target_size=(64, 64))
+                test_image = image.img_to_array(test_image)
+                test_image = np.expand_dims(test_image, axis=0)
+                result = classifier.predict_classes(test_image)
+                end = time.time()
+
+                if result[0][0] == 0 and 'cat' in imgPath:
+                    correctGuesses += 1
+                elif result[0][0] == 1 and 'dog' in imgPath:
+                    correctGuesses += 1
+                numGuesses += 1
+
+                times.append((end - start) * 1000)
+
+    accuracy = correctGuesses / numGuesses * 100
+    print('Average accuracy: %3.2f%%' % accuracy)
 
     averageTime = sum(times) / len(times)
-    print('Time: %8.2fms' %averageTime)
+    print('Average time: %8.2fms' % averageTime)
 
 
 if __name__ == '__main__':
