@@ -1,3 +1,7 @@
+"""
+This module builds a model that is a binary classifier
+"""
+
 from keras.models import Sequential
 from keras.layers import Conv2D
 from keras.layers import MaxPooling2D
@@ -8,10 +12,15 @@ from keras.callbacks import TensorBoard
 from keras.models import  model_from_json
 import numpy as np
 from time import time
-import csv
 
 
 def BuildModel():
+    """
+    Build the classifier model
+    :return: Sequential model instance of the built network
+    """
+
+    # Create a classifier with 5 layers
     classifier = Sequential()
     classifier.add(Conv2D(32, (3, 3), input_shape=(64, 64, 3), activation='relu'))
     classifier.add(MaxPooling2D(pool_size=(2, 2)))
@@ -41,18 +50,19 @@ def BuildModel():
                                                 batch_size=32,
                                                 class_mode='binary')
 
-    tensorboard = TensorBoard(log_dir="logs/{}".format(time()))
+    #tensorboard = TensorBoard(log_dir="logs/{}".format(time()))
     classifier.fit_generator(training_set,
                              steps_per_epoch=8000,
                              epochs=5,
                              validation_data=test_set,
-                             validation_steps=500,
-                             callbacks=[tensorboard])
+                             validation_steps=2100)
 
     model_json = classifier.to_json()
     with open("classifier.json", "w") as json_file:
         json_file.write(model_json)
-    classifier.save_weights('classifier_weights.h5')
+    classifier.save_weights('weights.h5')
+
+    return classifier
 
 if __name__ == '__main__':
     BuildModel()

@@ -1,47 +1,78 @@
+"""
+This module tests the model built via BuildModel
+"""
+
 from keras.models import model_from_json
 import numpy as np
 from keras.preprocessing import image
 import os
 import time
 
+
 def main():
 
     # Load the model from saved files
     with open('classifier.json', 'r') as json_file:
         loaded_model_json = json_file.read()
-
     classifier = model_from_json(loaded_model_json)
-    classifier.load_weights('classifier_weights.h5')
+    classifier.load_weights('weights.h5')
     classifier.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
+    # Paths to the testing data sets
+    catPath = 'data/test_set/cats'
+    dogPath = 'data/test_set/dogs'
+
+    # Track average times, and cat & dog accuracy
     times = []
-    path = 'data/test_set/'
-    correctGuesses = 0
-    numGuesses = 0
-    for root, dirs, files in os.walk(path):
-        for imgFile in files:
-            if imgFile.endswith('.jpg'):
+    correctCatGuesses = 0
+    numCatGuesses = 0
+    correctDogGuesses = 0
+    numDogGuesses = 0
 
-                imgPath = os.path.join(root, imgFile)
-                start = time.time()
-                test_image = image.load_img(imgPath, target_size=(64, 64))
-                test_image = image.img_to_array(test_image)
-                test_image = np.expand_dims(test_image, axis=0)
-                result = classifier.predict_classes(test_image)
-                end = time.time()
+    # Run inferences on the cat images
+    for imgFile in os.listdir(catPath):
+        if imgFile.endswith('.jpg'):
 
-                if result[0][0] == 0 and 'cat' in imgPath:
-                    correctGuesses += 1
-                elif result[0][0] == 1 and 'dog' in imgPath:
-                    correctGuesses += 1
-                numGuesses += 1
+            imgPath = os.path.join(catPath, imgFile)
+            start = time.time()
+            test_image = image.load_img(imgPath, target_size=(64, 64))
+            test_image = image.img_to_array(test_image)
+            test_image = np.expand_dims(test_image, axis=0)
+            result = classifier.predict_classes(test_image)
+            end = time.time()
 
-                times.append((end - start) * 1000)
+            if result[0][0] == 0:
+                correctCatGuesses += 1
+            numCatGuesses += 1
 
-    accuracy = correctGuesses / numGuesses * 100
-    print('Average accuracy: %3.2f%%' % accuracy)
+            times.append((end - start) * 1000)
 
+    # Run inferences on the dog images
+    for imgFile in os.listdir(dogPath):
+        if imgFile.endswith('jpg'):
+            imgPath = os.path.join(dogPath, imgFile)
+            start = time.time()
+            test_image = image.load_img(imgPath, target_size=(64, 64))
+            test_image = image.img_to_array(test_image)
+            test_image = np.expand_dims(test_image, axis=0)
+            result = classifier.predict_classes(test_image)
+            end = time.time()
+
+            if result[0][0] == 1:
+                correctDogGuesses += 1
+            numDogGuesses += 1
+
+            times.append((end - start) * 1000)
+
+    # Calculate average accuracies and times of the runs
+    accuracy = (correctCatGuesses + correctDogGuesses) / (numCatGuesses + numDogGuesses) * 100
+    catAccuracy = correctCatGuesses / numCatGuesses * 100
+    dogAccuracy = correctDogGuesses / numDogGuesses * 100
     averageTime = sum(times) / len(times)
+
+    print('Average accuracy: %3.2f%%' % accuracy)
+    print('Average cat accuracy: %3.2f%%' % catAccuracy)
+    print('Average dog accuracy: %3.2f%%' % dogAccuracy)
     print('Average time: %8.2fms' % averageTime)
 
 
