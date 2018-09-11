@@ -19,9 +19,12 @@ def BuildModel():
 
     batchSize = 16
     epochs = 5
+    modelFile = 'newModel.h5'
 
     # If we don't have any command line args, make a new model from scratch
     if len(sys.argv) <= 1:
+        print('No arguments -- creating new model from scratch')
+
         # Create the keras model
         classifier = models.Sequential()
 
@@ -52,6 +55,7 @@ def BuildModel():
     # If we do have a command line argument, it is the model file to load and start with
     else:
         modelFile = sys.argv[1]
+        print('Using model', modelFile, 'to continue training with')
         classifier = models.load_model(modelFile)
 
     # Augment training and tesing images
@@ -82,7 +86,7 @@ def BuildModel():
     tensorboardCb = TensorBoard(log_dir="logs/{}".format(time()))
 
     # Checkpoint callback will save the model throughout to a checkpointed file
-    checkpointCb = ModelCheckpoint('model_checkpoint.h5',
+    checkpointCb = ModelCheckpoint(modelFile,
                                    monitor='val_acc',
                                    verbose=1,
                                    save_best_only=True,
@@ -97,9 +101,6 @@ def BuildModel():
                              validation_data=testingGenerator,
                              validation_steps=800 // batchSize,
                              callbacks=callbacksList)
-
-    # Export the model to a file
-    classifier.save('model.h5')
 
     return classifier
 
