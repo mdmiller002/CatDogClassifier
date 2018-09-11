@@ -2,7 +2,7 @@
 This module tests the model built via BuildModel
 """
 
-from keras.models import model_from_json
+from keras.models import load_model
 import numpy as np
 from keras.preprocessing import image
 import os
@@ -11,12 +11,7 @@ import time
 
 def main():
 
-    # Load the model from saved files
-    with open('classifier.json', 'r') as json_file:
-        loaded_model_json = json_file.read()
-    classifier = model_from_json(loaded_model_json)
-    classifier.load_weights('weights.h5')
-    classifier.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+    classifier = load_model('model.h5')
 
     # Paths to the testing data sets
     catPath = 'data/test_set/cats'
@@ -32,10 +27,9 @@ def main():
     # Run inferences on the cat images
     for imgFile in os.listdir(catPath):
         if imgFile.endswith('.jpg'):
-
             imgPath = os.path.join(catPath, imgFile)
             start = time.time()
-            test_image = image.load_img(imgPath, target_size=(64, 64))
+            test_image = image.load_img(imgPath, target_size=(150, 150))
             test_image = image.img_to_array(test_image)
             test_image = np.expand_dims(test_image, axis=0)
             result = classifier.predict_classes(test_image)
@@ -52,7 +46,7 @@ def main():
         if imgFile.endswith('jpg'):
             imgPath = os.path.join(dogPath, imgFile)
             start = time.time()
-            test_image = image.load_img(imgPath, target_size=(64, 64))
+            test_image = image.load_img(imgPath, target_size=(150, 150))
             test_image = image.img_to_array(test_image)
             test_image = np.expand_dims(test_image, axis=0)
             result = classifier.predict_classes(test_image)

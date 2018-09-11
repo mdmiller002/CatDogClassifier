@@ -3,13 +3,9 @@ This module builds a model that is a binary classifier
 """
 
 from keras.models import Sequential
-from keras.layers import Conv2D
-from keras.layers import MaxPooling2D
-from keras.layers import Flatten
-from keras.layers import Dense
+from keras import layers
 from keras.preprocessing.image import ImageDataGenerator
-from keras.callbacks import TensorBoard
-from keras.models import  model_from_json
+from keras.callbacks import TensorBoard, ModelCheckpoint
 import numpy as np
 from time import time
 
@@ -20,47 +16,73 @@ def BuildModel():
     :return: Sequential model instance of the built network
     """
 
-    # Create a classifier with 5 layers
-    classifier = Sequential()
-    classifier.add(Conv2D(32, (3, 3), input_shape=(64, 64, 3), activation='relu'))
-    classifier.add(MaxPooling2D(pool_size=(2, 2)))
-    classifier.add(Flatten())
-    classifier.add(Dense(units=128, activation='relu'))
-    classifier.add(Dense(units=1, activation='sigmoid'))
-    classifier.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+    batchSize = 16
+    epochs = 5
 
-    train_datagen = ImageDataGenerator(rescale=1. / 255,
+    # Create the keras model
+    classifier = Sequential()
+
+    classifier.add(layers.Conv2D(32, (3, 3), input_shape=(150, 150, 3)))
+    classifier.add(layers.Activation('relu'))
+    classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
+
+    classifier.add(layers.Conv2D(32, (3, 3)))
+    classifier.add(layers.Activation('relu'))
+    classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
+
+    classifier.add(layers.Conv2D(64, (3, 3)))
+    classifier.add(layers.Activation('relu'))
+    classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
+
+    classifier.add(layers.Flatten())
+
+    classifier.add(layers.Dense(units=128))
+    classifier.add(layers.Activation('relu'))
+    classifier.add(layers.Dropout(0.5))
+    classifier.add(layers.Dense(1))
+    classifier.add(layers.Activation('sigmoid'))
+
+    classifier.compile(loss='binary_crossentropy',
+                  optimizer='rmsprop',
+                  metrics=['accuracy'])
+
+    # Augment training and tesing images
+    train_datagen = ImageDataGenerator(rescale=1./255,
                                        shear_range=0.2,
                                        zoom_range=0.2,
                                        horizontal_flip=True)
 
-    test_datagen = ImageDataGenerator(rescale=1. / 255)
+    test_datagen = ImageDataGenerator(rescale=1./255)
 
-    training_set = train_datagen.flow_from_directory('data/training_set',
-                                                     target_size=(64, 64),
-                                                     batch_size=32,
+    # Create generators for training and testing data
+    trainingGenerator = train_datagen.flow_from_directory('data/training_set',
+                                                     target_size=(150, 150),
+                                                     batch_size=batchSize,
                                                      class_mode='binary')
 
-    with open('classes.txt', 'w') as classesFile:
-        classesFile.write(str(training_set.class_indices))
 
-
-    test_set = test_datagen.flow_from_directory('data/test_set',
-                                                target_size=(64, 64),
-                                                batch_size=32,
+    testingGenerator = test_datagen.flow_from_directory('data/test_set',
+                                                target_size=(150, 150),
+                                                batch_size=batchSize,
                                                 class_mode='binary')
 
-    #tensorboard = TensorBoard(log_dir="logs/{}".format(time()))
-    classifier.fit_generator(training_set,
-                             steps_per_epoch=8000,
-                             epochs=5,
-                             validation_data=test_set,
-                             validation_steps=2100)
+    with open('classes.txt', 'w') as classesFile:
+        classesFile.write(str(trainingGenerator.class_indices))
 
-    model_json = classifier.to_json()
-    with open("classifier.json", "w") as json_file:
-        json_file.write(model_json)
-    classifier.save_weights('weights.h5')
+    # Callbacks
+    tensorboardCb = TensorBoard(log_dir="logs/{}".format(time()))
+    checkpointCb = ModelCheckpoint('model_checkpoint.h5', monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+
+    callbacksList = [checkpointCb]
+
+    classifier.fit_generator(trainingGenerator,
+                             steps_per_epoch= 2000 // batchSize,
+                             epochs=epochs,
+                             validation_data=testingGenerator,
+                             validation_steps=800 // batchSize,
+                             callbacks=callbacksList)
+
+    classifier.save('model.h5')
 
     return classifier
 
