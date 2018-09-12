@@ -1,24 +1,39 @@
 """
 This module tests the model built via BuildModel
+
+If running this file standalone, the usage is:
+    python.exe TestModel.py model_file'
 """
 
-from keras.models import load_model
 import numpy as np
-from keras.preprocessing import image
 import os
 import sys
 import time
 
 
 
-def main():
+def TestModel(modelIsFile, model):
 
-    modelFile = 'model.h5'
+    """
+    Test a model
+    :param modelIsFile: Boolean, if the model is a file. If it isn't,
+                        then it is a Keras model object
+    :param model: Model file, or object
+    :return: (float, float, float, float)
+             Average cat accuracy, average dog accuracy, average total accuracy, average time
+    """
+
+    from keras.models import load_model
+    from keras.preprocessing import image
+
     testDirectory = 'data/test_set/'
     CAT_CLASS = 0
     DOG_CLASS = 1
 
-    classifier = load_model(modelFile)
+    if modelIsFile:
+        classifier = load_model(model)
+    else:
+        classifier = model
 
 
     # Track average times, and cat & dog accuracy
@@ -68,6 +83,22 @@ def main():
     print('Average cat accuracy: %3.2f%%' % catAccuracy)
     print('Average dog accuracy: %3.2f%%' % dogAccuracy)
     print('Average time: %8.2fms' % averageTime)
+
+    return catAccuracy, dogAccuracy, accuracy, time
+
+
+def main():
+    usage = 'Usage: python.exe TestModel.py model_file'
+    if len(sys.argv) < 2:
+        print(usage)
+        return
+
+    if '-h' in sys.argv:
+        print(usage)
+        return
+
+    model = sys.argv[1]
+    TestModel(True, model)
 
 
 if __name__ == '__main__':

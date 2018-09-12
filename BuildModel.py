@@ -1,29 +1,40 @@
 """
 This module builds a model that is a binary classifier
+
+If running this file standalone, the usage is:
+    python.exe BuildModel.py num_epochs [model_file]
 """
 
-from keras import models
-from keras import layers
-from keras.preprocessing.image import ImageDataGenerator
-from keras.callbacks import TensorBoard, ModelCheckpoint
+
 import numpy as np
+import matplotlib.pyplot as plt
 from time import time
 import sys
 
 
-def BuildModel():
+
+
+def BuildModel(epochs, model=None):
     """
     Build the classifier model
+    :param: epochs - number of epochs to train for
+    :param: model - model file, if exists, to load and continue training
     :return: Sequential model instance of the built network
     """
 
+    from keras import models
+    from keras import layers
+    from keras.preprocessing.image import ImageDataGenerator
+    from keras.callbacks import TensorBoard, ModelCheckpoint, Callback
+
     batchSize = 16
-    epochs = 5
+    nTrainingSamples = 5000
+    nTestingSamples = 2100
     modelFile = 'newModel.h5'
 
     # If we don't have any command line args, make a new model from scratch
-    if len(sys.argv) <= 1:
-        print('No arguments -- creating new model from scratch')
+    if model is None:
+        print('No arguments -- creating new model from scratch and writing to', modelFile)
 
         # Create the keras model
         classifier = models.Sequential()
@@ -54,7 +65,7 @@ def BuildModel():
 
     # If we do have a command line argument, it is the model file to load and start with
     else:
-        modelFile = sys.argv[1]
+        modelFile = model
         print('Using model', modelFile, 'to continue training with')
         classifier = models.load_model(modelFile)
 
@@ -95,14 +106,64 @@ def BuildModel():
     callbacksList = [checkpointCb]
 
     # Train the model, checkpointing along the way
-    classifier.fit_generator(trainingGenerator,
-                             steps_per_epoch= 2000 // batchSize,
+    history = classifier.fit_generator(trainingGenerator,
+                             steps_per_epoch=(nTrainingSamples // batchSize),
                              epochs=epochs,
                              validation_data=testingGenerator,
-                             validation_steps=800 // batchSize,
+                             validation_steps=(nTestingSamples // batchSize),
                              callbacks=callbacksList)
+
+    PlotTrainingAccuracy(history)
+    PlotTrainingLosses(history)
 
     return classifier
 
+
+def PlotTrainingAccuracy(history):
+    """
+    Plot training accuracy
+    :param: history - return value of fit training method
+    """
+    plt.plot(history.history['acc'])
+    plt.plot(history.history['val_acc'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+
+
+def PlotTrainingLosses(history):
+    """
+    Plot training losses
+    :param history: return value of fit training method
+    """
+    # summarize history for loss
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+
+
+
+def main():
+    usage = 'Usage: python.exe BuildModel.py number_epochs [model_file]'
+    if len(sys.argv) < 2:
+        print(usage)
+        return
+
+    if '-h' in sys.argv:
+        print(usage)
+        return
+
+    epochs = int(sys.argv[1])
+    model = None
+    if len(sys.argv) >= 3:
+        model = sys.argv[2]
+    BuildModel(epochs, model)
+
 if __name__ == '__main__':
-    BuildModel()
+    main()
