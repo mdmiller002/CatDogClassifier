@@ -6,6 +6,7 @@ If running this file standalone, the usage is:
 """
 
 import numpy as np
+import cv2
 import os
 import sys
 import time
@@ -51,10 +52,10 @@ def TestModel(modelIsFile, model):
                 # Run the inference on the image
                 imgPath = os.path.join(root, imgFile)
                 start = time.time()
-                test_image = image.load_img(imgPath, target_size=(150, 150))
-                test_image = image.img_to_array(test_image)
-                test_image = np.expand_dims(test_image, axis=0)
-                result = classifier.predict_classes(test_image)
+                img = cv2.imread(imgPath)
+                img = cv2.resize(img, (150, 150))
+                img = np.reshape(img, [1, 150, 150, 3])
+                result = classifier.predict_classes(img)
                 end = time.time()
 
                 if 'cats' in imgPath:
