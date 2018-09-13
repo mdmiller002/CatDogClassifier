@@ -7,8 +7,9 @@ def main():
 
     epochs = 5
 
-    with open('results.csv', 'w') as file:
-        writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    with open('results.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Epochs', 'Cat Accuracy', 'Dog Accuracy', 'Total Accuracy', 'Average Time'])
 
         # Make and test one model, so we have a new model file
         BuildModel.BuildModel(epochs, None)
