@@ -113,8 +113,8 @@ def BuildModel(epochs, model=None):
                              validation_steps=(nTestingSamples // batchSize),
                              callbacks=callbacksList)
 
-    PlotTrainingAccuracy(history)
-    PlotTrainingLosses(history)
+    #PlotTrainingAccuracy(history)
+    #PlotTrainingLosses(history)
 
     return classifier
 

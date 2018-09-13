@@ -69,9 +69,9 @@ def TestModel(modelIsFile, model):
                     numDogGuesses += 1
 
                 times.append((end - start) * 1000)
-                print('*', end='')
-                sys.stdout.flush()
-    print()
+                #print('*', end='')
+                #sys.stdout.flush()
+    #print()
 
 
     # Calculate average accuracies and times of the runs
@@ -85,7 +85,7 @@ def TestModel(modelIsFile, model):
     print('Average dog accuracy: %3.2f%%' % dogAccuracy)
     print('Average time: %8.2fms' % averageTime)
 
-    return catAccuracy, dogAccuracy, accuracy, time
+    return catAccuracy, dogAccuracy, accuracy, averageTime
 
 
 def main():
