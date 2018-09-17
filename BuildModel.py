@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from time import time
 import sys
+import Config
 
 
 
@@ -39,7 +40,7 @@ def BuildModel(epochs, model=None):
         # Create the keras model
         classifier = models.Sequential()
 
-        classifier.add(layers.Conv2D(32, (3, 3), input_shape=(150, 150, 3)))
+        classifier.add(layers.Conv2D(32, (3, 3), input_shape=(Config.imgRows, Config.imgCols, Config.imgChannels)))
         classifier.add(layers.Activation('relu'))
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
@@ -78,16 +79,22 @@ def BuildModel(epochs, model=None):
     test_datagen = ImageDataGenerator(rescale=1./255)
 
     # Create generators for training and testing data
+    if Config.imgChannels == 1:
+        colorMode = 'grayscale'
+    else:
+        colorMode = 'rgb'
     trainingGenerator = train_datagen.flow_from_directory('data/training_set',
-                                                     target_size=(150, 150),
+                                                     target_size=(Config.imgRows, Config.imgCols),
                                                      batch_size=batchSize,
-                                                     class_mode='binary')
+                                                     class_mode='binary',
+                                                     color_mode=colorMode)
 
 
     testingGenerator = test_datagen.flow_from_directory('data/test_set',
-                                                target_size=(150, 150),
+                                                target_size=(Config.imgRows, Config.imgCols),
                                                 batch_size=batchSize,
-                                                class_mode='binary')
+                                                class_mode='binary',
+                                                color_mode=colorMode)
 
     # Save the classes to a file for use later
     with open('classes.txt', 'w') as classesFile:

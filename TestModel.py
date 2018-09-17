@@ -10,7 +10,7 @@ import cv2
 import os
 import sys
 import time
-
+import Config
 
 
 def TestModel(modelIsFile, model):
@@ -53,8 +53,10 @@ def TestModel(modelIsFile, model):
                 imgPath = os.path.join(root, imgFile)
                 start = time.time()
                 img = cv2.imread(imgPath)
-                img = cv2.resize(img, (150, 150))
-                img = np.reshape(img, [1, 150, 150, 3])
+                if Config.imgChannels == 1:
+                    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                img = cv2.resize(img, (Config.imgRows, Config.imgCols))
+                img = np.reshape(img, [1, Config.imgRows, Config.imgCols, Config.imgChannels])
                 result = classifier.predict_classes(img)
                 end = time.time()
 
