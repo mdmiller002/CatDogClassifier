@@ -30,7 +30,7 @@ def main():
 
         for i in range(2, 1000):
             print('Iteration', i)
-            BuildModel.BuildModel(epochs, 'newModel.h5')
+            BuildModel.BuildModel(epochs, modelFile)
             cat, dog, acc, time = TestModel.TestModel(True, modelFile)
             writer.writerow([i * epochs, cat, dog, acc, time])
             file.flush()
