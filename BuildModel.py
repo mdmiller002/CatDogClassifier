@@ -29,8 +29,8 @@ def BuildModel(epochs, model=None):
     from keras.callbacks import TensorBoard, ModelCheckpoint, Callback
 
     batchSize = 16
-    nTrainingSamples = 5000
-    nTestingSamples = 2100
+    nTrainingSamples = 6919
+    nTestingSamples = 2023
     modelFile = 'newModel.h5'
 
     # If we don't have any command line args, make a new model from scratch
