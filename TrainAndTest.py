@@ -1,26 +1,39 @@
 import BuildModel
 import TestModel
 import csv
+import sys
 
 
 def main():
 
     epochs = 5
 
+    modelFile = 'newModel.h5'
+    newModel = True
+    if len(sys.argv) > 1:
+        modelFile = sys.argv[1]
+        newModel = False
+
     with open('results.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(['Epochs', 'Cat Accuracy', 'Dog Accuracy', 'Total Accuracy', 'Average Time'])
+        file.flush()
 
         # Make and test one model, so we have a new model file
-        BuildModel.BuildModel(epochs, None)
-        cat, dog, acc, time = TestModel.TestModel(True, 'newModel.h5')
+        if newModel:
+            BuildModel.BuildModel(epochs, None)
+        else:
+            BuildModel.BuildModel(epochs, modelFile)
+        cat, dog, acc, time = TestModel.TestModel(True, modelFile)
         writer.writerow([epochs, cat, dog, acc, time])
+        file.flush()
 
         for i in range(2, 1000):
             print('Iteration', i)
             BuildModel.BuildModel(epochs, 'newModel.h5')
-            cat, dog, acc, time = TestModel.TestModel(True, 'newModel.h5')
+            cat, dog, acc, time = TestModel.TestModel(True, modelFile)
             writer.writerow([i * epochs, cat, dog, acc, time])
+            file.flush()
 
 
 
