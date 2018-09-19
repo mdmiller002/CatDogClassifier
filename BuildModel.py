@@ -3,6 +3,8 @@ This module builds a model that is a binary classifier
 
 If running this file standalone, the usage is:
     python.exe BuildModel.py num_epochs [model_file]
+        - num_epochs: number of epochs to train for
+        - model_file: model file to pick up training with (optional)
 """
 
 
@@ -110,7 +112,7 @@ def BuildModel(epochs, model=None):
                                    save_best_only=True,
                                    mode='max')
 
-    callbacksList = [checkpointCb]
+    callbacksList = [checkpointCb, tensorboardCb]
 
     # Train the model, checkpointing along the way
     history = classifier.fit_generator(trainingGenerator,

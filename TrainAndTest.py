@@ -1,3 +1,10 @@
+"""
+Train and test a model incrementally
+
+Usage: python.exe TrainAndTest.py [model_file]
+            - model_file: model file to pick up training with (optional)
+"""
+
 import BuildModel
 import TestModel
 import csv

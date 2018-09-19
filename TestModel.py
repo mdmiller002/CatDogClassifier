@@ -2,7 +2,8 @@
 This module tests the model built via BuildModel
 
 If running this file standalone, the usage is:
-    python.exe TestModel.py model_file'
+    python.exe TestModel.py model_file
+        - model_file: model_file to test with
 """
 
 import numpy as np
