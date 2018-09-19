@@ -16,15 +16,18 @@ def main():
     epochs = 5
 
     modelFile = 'newModel.h5'
+    writeMode = 'w'
     newModel = True
     if len(sys.argv) > 1:
         modelFile = sys.argv[1]
         newModel = False
+        writeMode = 'a'
 
-    with open('results.csv', 'w', newline='') as file:
+    with open('results.csv', writeMode, newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['Epochs', 'Cat Accuracy', 'Dog Accuracy', 'Total Accuracy', 'Average Time'])
-        file.flush()
+        if writeMode == 'w':
+            writer.writerow(['Epochs', 'Cat Accuracy', 'Dog Accuracy', 'Total Accuracy', 'Average Time'])
+            file.flush()
 
         # Make and test one model, so we have a new model file
         if newModel:
