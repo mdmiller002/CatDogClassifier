@@ -30,7 +30,7 @@ def BuildModel(epochs, model=None):
     from keras.preprocessing.image import ImageDataGenerator
     from keras.callbacks import TensorBoard, ModelCheckpoint, Callback
 
-    batchSize = 16
+    batchSize = 64
     nTrainingSamples = 6919
     nTestingSamples = 2023
     modelFile = 'newModel.h5'
