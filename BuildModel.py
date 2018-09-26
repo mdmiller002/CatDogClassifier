@@ -35,7 +35,7 @@ def BuildModel(epochs, model=None):
     nTestingSamples = 2023
     modelFile = 'newModel.h5'
 
-    # If we don't have any command line args, make a new model from scratch
+    # If we don't have a working model, make a new model from scratch
     if model is None:
         print('No arguments -- creating new model from scratch and writing to', modelFile)
 
@@ -67,7 +67,7 @@ def BuildModel(epochs, model=None):
                            loss='binary_crossentropy',
                            metrics=['accuracy'])
 
-    # If we do have a command line argument, it is the model file to load and start with
+    # If we do have a model, load this model and continue training it
     else:
         modelFile = model
         print('Using model', modelFile, 'to continue training with')
