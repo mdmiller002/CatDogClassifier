@@ -12,6 +12,7 @@ import os
 import sys
 import time
 import Config
+from keras.preprocessing import image
 
 
 def TestModel(modelIsFile, model):
@@ -58,6 +59,11 @@ def TestModel(modelIsFile, model):
                     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 img = cv2.resize(img, (Config.imgRows, Config.imgCols))
                 img = np.reshape(img, [1, Config.imgRows, Config.imgCols, Config.imgChannels])
+                #img = image.load_img(imgPath,
+                #                     target_size=(Config.imgRows, Config.imgCols),
+                #                     color_mode='grayscale')
+                #img = image.img_to_array(img)
+                #img = np.expand_dims(img, axis=0)
                 result = classifier.predict_classes(img)
                 end = time.time()
 

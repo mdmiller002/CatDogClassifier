@@ -41,30 +41,31 @@ def BuildModel(epochs, model=None):
 
         # Create the keras model
         classifier = models.Sequential()
+        inputShape = (Config.imgRows, Config.imgCols, Config.imgChannels)
 
-        classifier.add(layers.Conv2D(32, (3, 3), input_shape=(Config.imgRows, Config.imgCols, Config.imgChannels)))
-        classifier.add(layers.Activation('relu'))
+        # Add convolutional input layer with 32 (3, 3) sized filters and then a Max Pooling layer
+        classifier.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=inputShape))
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
-        classifier.add(layers.Conv2D(32, (3, 3)))
-        classifier.add(layers.Activation('relu'))
+        # Convolutional layer with 32 (3, 3) sized filters and then Max Pooling
+        classifier.add(layers.Conv2D(32, (3, 3), activation='relu'))
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
-        classifier.add(layers.Conv2D(64, (3, 3)))
-        classifier.add(layers.Activation('relu'))
+        # Convolutional layer with 64 (3, 3) sized filters and then Max Pooling
+        classifier.add(layers.Conv2D(64, (3, 3), activation='relu'))
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
+        # Flattening layer
         classifier.add(layers.Flatten())
 
-        classifier.add(layers.Dense(units=128))
-        classifier.add(layers.Activation('relu'))
+        # Fully connected layer with 128 nodes, and then output layer with 1 node
+        classifier.add(layers.Dense(units=128, activation='relu'))
         classifier.add(layers.Dropout(0.5))
-        classifier.add(layers.Dense(1))
-        classifier.add(layers.Activation('sigmoid'))
+        classifier.add(layers.Dense(1, activation='sigmoid'))
 
-        classifier.compile(loss='binary_crossentropy',
-                      optimizer='rmsprop',
-                      metrics=['accuracy'])
+        classifier.compile(optimizer='rmsprop',
+                           loss='binary_crossentropy',
+                           metrics=['accuracy'])
 
     # If we do have a command line argument, it is the model file to load and start with
     else:
