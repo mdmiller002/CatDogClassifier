@@ -105,7 +105,7 @@ def BuildModel(epochs, model=None):
     checkpointCb = ModelCheckpoint(modelFile,
                                    monitor='val_acc',
                                    verbose=1,
-                                   save_best_only=True,
+                                   save_best_only=False,
                                    mode='max')
 
     callbacksList = [checkpointCb, tensorboardCb]

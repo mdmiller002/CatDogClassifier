@@ -1,8 +1,9 @@
 """
 Train and test a model incrementally
 
-Usage: python.exe TrainAndTest.py [model_file]
+Usage: python.exe TrainAndTest.py [model_file] [results_file]
             - model_file: model file to pick up training with (optional)
+            - results_file: output CSV file to write output to (optional)
 """
 
 import BuildModel
@@ -23,7 +24,12 @@ def main():
         newModel = False
         writeMode = 'a'
 
-    with open('results.csv', writeMode, newline='') as file:
+    resultsFile = 'results.csv'
+    if len(sys.argv) > 2:
+        resultsFile = sys.argv[2]
+
+
+    with open(resultsFile, writeMode, newline='') as file:
         writer = csv.writer(file)
         if writeMode == 'w':
             writer.writerow(['Epochs', 'Cat Accuracy', 'Dog Accuracy', 'Total Accuracy', 'Average Time'])
