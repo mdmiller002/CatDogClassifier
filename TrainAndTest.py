@@ -9,24 +9,40 @@ Usage: python.exe TrainAndTest.py [model_file] [results_file]
 import BuildModel
 import TestModel
 import csv
-import sys
+import argparse
 
 
 def main():
 
-    epochs = 5
+    parser = argparse.ArgumentParser(
+        description='Train a model and test along the way')
+    parser.add_argument('--epochs',
+                        metavar='epochs',
+                        type=int,
+                        default=5,
+                        help='Number of epochs to train during each iteration')
+    parser.add_argument('--model',
+                        metavar='model',
+                        type=str,
+                        help='Model file to continue training with')
+    parser.add_argument('--outputCsv',
+                        metavar='output_csv',
+                        type=str,
+                        help='CSV file to output file to')
+    args = parser.parse_args()
+    print(args)
 
     modelFile = 'newModel.h5'
     writeMode = 'w'
     newModel = True
-    if len(sys.argv) > 1:
-        modelFile = sys.argv[1]
+    if args.model is not None:
+        modelFile = args.model
         newModel = False
         writeMode = 'a'
 
     resultsFile = 'results.csv'
-    if len(sys.argv) > 2:
-        resultsFile = sys.argv[2]
+    if args.outputCsv is not None:
+        resultsFile = args.outputCsv
 
 
     with open(resultsFile, writeMode, newline='') as file:
@@ -37,18 +53,18 @@ def main():
 
         # Make and test one model, so we have a new model file
         if newModel:
-            BuildModel.BuildModel(epochs, None)
+            BuildModel.BuildModel(args.epochs, None)
         else:
-            BuildModel.BuildModel(epochs, modelFile)
+            BuildModel.BuildModel(args.epochs, modelFile)
         cat, dog, acc, time = TestModel.TestModel(True, modelFile)
-        writer.writerow([epochs, cat, dog, acc, time])
+        writer.writerow([args.epochs, cat, dog, acc, time])
         file.flush()
 
         for i in range(2, 1000):
             print('Iteration', i)
-            BuildModel.BuildModel(epochs, modelFile)
+            BuildModel.BuildModel(args.epochs, modelFile)
             cat, dog, acc, time = TestModel.TestModel(True, modelFile)
-            writer.writerow([i * epochs, cat, dog, acc, time])
+            writer.writerow([i * args.epochs, cat, dog, acc, time])
             file.flush()
 
 
