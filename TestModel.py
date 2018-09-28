@@ -1,9 +1,5 @@
 """
 This module tests the model built via BuildModel
-
-If running this file standalone, the usage is:
-    python.exe TestModel.py model_file
-        - model_file: model_file to test with
 """
 
 import numpy as np
@@ -13,6 +9,7 @@ import sys
 import time
 import Config
 from keras.preprocessing import image
+import argparse
 
 
 def TestModel(modelIsFile, model):
@@ -97,19 +94,16 @@ def TestModel(modelIsFile, model):
     return catAccuracy, dogAccuracy, accuracy, averageTime
 
 
-def main():
-    usage = 'Usage: python.exe TestModel.py model_file'
-    if len(sys.argv) < 2:
-        print(usage)
-        return
-
-    if '-h' in sys.argv:
-        print(usage)
-        return
-
-    model = sys.argv[1]
-    TestModel(True, model)
-
 
 if __name__ == '__main__':
-    main()
+
+    parser = argparse.ArgumentParser(
+        description='Test a model')
+
+    parser.add_argument('model',
+                        type=str,
+                        help='Model file to test')
+
+    args = parser.parse_args()
+
+    TestModel(True, args.model)

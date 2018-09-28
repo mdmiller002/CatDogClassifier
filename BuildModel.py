@@ -1,10 +1,5 @@
 """
 This module builds a model that is a binary classifier
-
-If running this file standalone, the usage is:
-    python.exe BuildModel.py num_epochs [model_file]
-        - num_epochs: number of epochs to train for
-        - model_file: model file to pick up training with (optional)
 """
 
 
@@ -13,6 +8,7 @@ import matplotlib.pyplot as plt
 from time import time
 import sys
 import Config
+import argparse
 
 
 
@@ -55,7 +51,7 @@ def BuildModel(epochs, model=None):
         classifier.add(layers.Flatten())
 
         classifier.add(layers.Dense(units=128, activation='relu'))
-        classifier.add(layers.Dropout(0.5))
+        classifier.add(layers.Dropout(0.1))
         classifier.add(layers.Dense(1, activation='sigmoid'))
 
         classifier.compile(optimizer='rmsprop',
@@ -154,21 +150,19 @@ def PlotTrainingLosses(history):
 
 
 
-def main():
-    usage = 'Usage: python.exe BuildModel.py number_epochs [model_file]'
-    if len(sys.argv) < 2:
-        print(usage)
-        return
-
-    if '-h' in sys.argv:
-        print(usage)
-        return
-
-    epochs = int(sys.argv[1])
-    model = None
-    if len(sys.argv) >= 3:
-        model = sys.argv[2]
-    BuildModel(epochs, model)
-
 if __name__ == '__main__':
-    main()
+
+    parser = argparse.ArgumentParser(
+        description='Train a deep learning model')
+
+    parser.add_argument('epochs',
+                        type=int,
+                        help='Number of epochs to train for')
+
+    parser.add_argument('--model',
+                        type=str,
+                        help='Model file to continue training with')
+
+    args = parser.parse_args()
+
+    BuildModel(args.epochs, args.model)
