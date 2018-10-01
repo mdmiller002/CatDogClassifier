@@ -9,6 +9,7 @@ from time import time
 import sys
 import Config
 import argparse
+import os
 
 
 
@@ -27,8 +28,9 @@ def BuildModel(epochs, model=None):
     from keras.callbacks import TensorBoard, ModelCheckpoint, Callback
 
     batchSize = 64
-    nTrainingSamples = 6919
-    nTestingSamples = 2023
+
+    nTrainingSamples = sum([len(files) for r, d, files in os.walk('data/training_set')])
+    nTestingSamples = sum([len(files) for r, d, files in os.walk('data/test_set')])
     modelFile = 'newModel.h5'
 
     # If we don't have a working model, make a new model from scratch
