@@ -3,7 +3,7 @@ This module tests the model built via BuildModel
 """
 
 import numpy as np
-import cv2
+#import cv2
 import os
 import sys
 import time
@@ -51,16 +51,16 @@ def TestModel(modelIsFile, model):
                 # Run the inference on the image
                 imgPath = os.path.join(root, imgFile)
                 start = time.time()
-                img = cv2.imread(imgPath)
-                if Config.imgChannels == 1:
-                    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                img = cv2.resize(img, (Config.imgRows, Config.imgCols))
-                img = np.reshape(img, [1, Config.imgRows, Config.imgCols, Config.imgChannels])
-                #img = image.load_img(imgPath,
-                #                     target_size=(Config.imgRows, Config.imgCols),
-                #                     color_mode='grayscale')
-                #img = image.img_to_array(img)
-                #img = np.expand_dims(img, axis=0)
+                #img = cv2.imread(imgPath)
+                #if Config.imgChannels == 1:
+                #    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                #img = cv2.resize(img, (Config.imgRows, Config.imgCols))
+                #img = np.reshape(img, [1, Config.imgRows, Config.imgCols, Config.imgChannels])
+                img = image.load_img(imgPath,
+                                     target_size=(Config.imgRows, Config.imgCols),
+                                     color_mode='grayscale')
+                img = image.img_to_array(img)
+                img = np.expand_dims(img, axis=0)
                 result = classifier.predict_classes(img)
                 end = time.time()
 

@@ -3,6 +3,6 @@ Configuration file holding configuration variables
 that are used across files
 """
 
-imgRows = 300
-imgCols = 300
+imgRows = 200
+imgCols = 200
 imgChannels = 1

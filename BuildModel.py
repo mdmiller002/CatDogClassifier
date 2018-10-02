@@ -3,14 +3,11 @@ This module builds a model that is a binary classifier
 """
 
 
-import numpy as np
 import matplotlib.pyplot as plt
-from time import time
-import sys
 import Config
 import argparse
 import os
-
+from datetime import datetime
 
 
 
@@ -25,13 +22,16 @@ def BuildModel(epochs, model=None):
     from keras import models
     from keras import layers
     from keras.preprocessing.image import ImageDataGenerator
-    from keras.callbacks import TensorBoard, ModelCheckpoint, Callback
+    from keras.callbacks import ModelCheckpoint
 
-    batchSize = 64
+    batchSize = 128
+    trainingPath = 'data/training_set'
+    testingPath = 'data/test_set'
 
-    nTrainingSamples = sum([len(files) for r, d, files in os.walk('data/training_set')])
-    nTestingSamples = sum([len(files) for r, d, files in os.walk('data/test_set')])
-    modelFile = 'newModel.h5'
+    nTrainingSamples = sum([len(files) for r, d, files in os.walk(trainingPath)])
+    nTestingSamples = sum([len(files) for r, d, files in os.walk(testingPath)])
+    now = datetime.now()
+    modelFile = ''.join(['newModel-', now.strftime("%b%d_%I%M%S%p"), '.h5'])
 
     # If we don't have a working model, make a new model from scratch
     if model is None:
@@ -41,19 +41,25 @@ def BuildModel(epochs, model=None):
         classifier = models.Sequential()
         inputShape = (Config.imgRows, Config.imgCols, Config.imgChannels)
 
-        classifier.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=inputShape))
-        classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
-
+        classifier.add(layers.Conv2D(32, (3, 3), padding='same', activation='relu', input_shape=inputShape))
         classifier.add(layers.Conv2D(32, (3, 3), activation='relu'))
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
+        classifier.add(layers.Dropout(0.2))
 
+        classifier.add(layers.Conv2D(64, (3, 3), padding='same', activation='relu'))
         classifier.add(layers.Conv2D(64, (3, 3), activation='relu'))
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
+        classifier.add(layers.Dropout(0.2))
+
+        classifier.add(layers.Conv2D(64, (3, 3), padding='same', activation='relu'))
+        classifier.add(layers.Conv2D(64, (3, 3), activation='relu'))
+        classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
+        classifier.add(layers.Dropout(0.2))
 
         classifier.add(layers.Flatten())
 
-        classifier.add(layers.Dense(units=128, activation='relu'))
-        classifier.add(layers.Dropout(0.1))
+        classifier.add(layers.Dense(units=512, activation='relu'))
+        classifier.add(layers.Dropout(0.3))
         classifier.add(layers.Dense(1, activation='sigmoid'))
 
         classifier.compile(optimizer='rmsprop',
@@ -79,14 +85,14 @@ def BuildModel(epochs, model=None):
         colorMode = 'grayscale'
     else:
         colorMode = 'rgb'
-    trainingGenerator = train_datagen.flow_from_directory('data/training_set',
+    trainingGenerator = train_datagen.flow_from_directory(trainingPath,
                                                      target_size=(Config.imgRows, Config.imgCols),
                                                      batch_size=batchSize,
                                                      class_mode='binary',
                                                      color_mode=colorMode)
 
 
-    testingGenerator = test_datagen.flow_from_directory('data/test_set',
+    testingGenerator = test_datagen.flow_from_directory(testingPath,
                                                 target_size=(Config.imgRows, Config.imgCols),
                                                 batch_size=batchSize,
                                                 class_mode='binary',
@@ -97,7 +103,7 @@ def BuildModel(epochs, model=None):
         classesFile.write(str(trainingGenerator.class_indices))
 
     # Set up callbacks to use during training process
-    tensorboardCb = TensorBoard(log_dir="logs/{}".format(time()))
+    #tensorboardCb = TensorBoard(log_dir="logs/{}".format(time()))
 
     # Checkpoint callback will save the model throughout to a checkpointed file
     checkpointCb = ModelCheckpoint(modelFile,
@@ -106,7 +112,7 @@ def BuildModel(epochs, model=None):
                                    save_best_only=False,
                                    mode='max')
 
-    callbacksList = [checkpointCb, tensorboardCb]
+    callbacksList = [checkpointCb]
 
     # Train the model, checkpointing along the way
     history = classifier.fit_generator(trainingGenerator,
@@ -116,8 +122,8 @@ def BuildModel(epochs, model=None):
                              validation_steps=(nTestingSamples // batchSize),
                              callbacks=callbacksList)
 
-    #PlotTrainingAccuracy(history)
-    #PlotTrainingLosses(history)
+    PlotTrainingAccuracy(history)
+    PlotTrainingLosses(history)
 
     return classifier
 
@@ -141,7 +147,6 @@ def PlotTrainingLosses(history):
     Plot training losses
     :param history: return value of fit training method
     """
-    # summarize history for loss
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
     plt.title('model loss')
