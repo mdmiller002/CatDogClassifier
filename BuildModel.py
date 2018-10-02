@@ -31,7 +31,7 @@ def BuildModel(epochs, model=None):
     nTrainingSamples = sum([len(files) for r, d, files in os.walk(trainingPath)])
     nTestingSamples = sum([len(files) for r, d, files in os.walk(testingPath)])
     now = datetime.now()
-    modelFile = ''.join(['newModel-', now.strftime("%b%d_%I%M%S%p"), '.h5'])
+    modelFile = ''.join(['newModel_', now.strftime("%b%d_%I%M%S%p"), '.h5'])
 
     # If we don't have a working model, make a new model from scratch
     if model is None:
