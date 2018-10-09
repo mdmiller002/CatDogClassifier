@@ -49,7 +49,7 @@ def BuildModel(epochs, model=None):
         classifier.add(layers.Conv2D(64, (3, 3), padding='same', activation='relu'))
         classifier.add(layers.Conv2D(64, (3, 3), activation='relu'))
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
-        classifier.add(layers.Dropout(0.2))
+        classifier.add(layers.Dropout(0.25))
 
         classifier.add(layers.Conv2D(64, (3, 3), padding='same', activation='relu'))
         classifier.add(layers.Conv2D(64, (3, 3), activation='relu'))
