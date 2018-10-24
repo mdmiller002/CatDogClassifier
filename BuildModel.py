@@ -17,20 +17,29 @@ def BuildModel(epochs, model=None):
     :param: epochs - number of epochs to train for
     :param: model - model file, if exists, to load and continue training
     :return: Sequential model instance of the built network
+    This has been changed to history of the Sequential model
+    *Note the Sequential model will be saved to file model_creation_time
     """
 
     from keras import models
     from keras import layers
     from keras.preprocessing.image import ImageDataGenerator
-    from keras.callbacks import ModelCheckpoint
+    from keras.callbacks import ModelCheckpoint,CSVLogger
 
-    batchSize = 128
+    batchSize = 64
     trainingPath = 'data/training_set'
     testingPath = 'data/test_set'
 
     nTrainingSamples = sum([len(files) for r, d, files in os.walk(trainingPath)])
     nTestingSamples = sum([len(files) for r, d, files in os.walk(testingPath)])
+
+	# use this to limit computation for testing
+    # nTrainingSamples = 3 * batchSize
+    # nTestingSamples = 3*batchSize
+
     now = datetime.now()
+
+
     modelFile = ''.join(['newModel_', now.strftime("%b%d_%I%M%S%p"), '.h5'])
 
     # If we don't have a working model, make a new model from scratch
@@ -90,6 +99,7 @@ def BuildModel(epochs, model=None):
                                                      batch_size=batchSize,
                                                      class_mode='binary',
                                                      color_mode=colorMode)
+    
 
 
     testingGenerator = test_datagen.flow_from_directory(testingPath,
@@ -112,7 +122,13 @@ def BuildModel(epochs, model=None):
                                    save_best_only=False,
                                    mode='max')
 
-    callbacksList = [checkpointCb]
+    # saves the last epoch's to a file in case of keyboard interrupt
+    checkpointCSV = CSVLogger("lastEpochMetrics.csv",
+                              separator=",",
+                              append=False)
+
+    #callbacksList = []
+    callbacksList = [checkpointCb,checkpointCSV]
 
     # Train the model, checkpointing along the way
     history = classifier.fit_generator(trainingGenerator,
@@ -122,10 +138,10 @@ def BuildModel(epochs, model=None):
                              validation_steps=(nTestingSamples // batchSize),
                              callbacks=callbacksList)
 
-    PlotTrainingAccuracy(history)
-    PlotTrainingLosses(history)
+    #PlotTrainingAccuracy(history)
+    #PlotTrainingLosses(history)
 
-    return classifier
+    return history
 
 
 def PlotTrainingAccuracy(history):
