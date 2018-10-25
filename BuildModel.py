@@ -16,9 +16,7 @@ def BuildModel(epochs, model=None):
     Build the classifier model
     :param: epochs - number of epochs to train for
     :param: model - model file, if exists, to load and continue training
-    :return: Sequential model instance of the built network
-    This has been changed to history of the Sequential model
-    *Note the Sequential model will be saved to file model_creation_time
+    :return: Keras training history
     """
 
     from keras import models
@@ -33,7 +31,7 @@ def BuildModel(epochs, model=None):
     nTrainingSamples = sum([len(files) for r, d, files in os.walk(trainingPath)])
     nTestingSamples = sum([len(files) for r, d, files in os.walk(testingPath)])
 
-	# use this to limit computation for testing
+    # use this to limit computation for testing
     # nTrainingSamples = 3 * batchSize
     # nTestingSamples = 3*batchSize
 
