@@ -23,6 +23,7 @@ def TrainAndTest(epochs, iterations, model, resultsCsv):
 		resultsFile = resultsCsv
 
 	with open(resultsFile, writeMode, newline='') as results_file, open("PerEpochMetrics.csv", writeMode, newline='') as PerE_file:
+
 		results_writer = csv.writer(results_file)
 		PerE_writer = csv.writer(PerE_file)
 		if writeMode == 'w':
@@ -32,26 +33,15 @@ def TrainAndTest(epochs, iterations, model, resultsCsv):
 			PerE_file.flush()
 
 		# Make and test one model, so we have a new model results_file
-		if newModel:
-			hist = BuildModel.BuildModel(epochs, None)
-		else:
-			hist = BuildModel.BuildModel(epochs, modelFile)
-		cat, dog, acc, time = TestModel.TestModel(True, modelFile)
-
-		# write history
-		val_loss = hist.history['val_loss']
-		val_acc = hist.history['val_acc']
-		loss = hist.history['loss']
-		acc = hist.history['acc']
-		for epoch in hist.epoch:
-			PerE_writer.writerow([epoch,val_loss[epoch],val_acc[epoch],loss[epoch],acc[epoch]])
-		PerE_file.flush()
-		results_writer.writerow([epochs, cat, dog, acc, time])
-		results_file.flush()
 
 		for i in range(1, iterations):
 			print('Iteration', i)
-			BuildModel.BuildModel(epochs, modelFile)
+
+			if newModel and i == 1:
+				hist, modelFile = BuildModel.BuildModel(epochs, None)
+			else:
+				hist, modelFile = BuildModel.BuildModel(epochs, modelFile)
+
 			cat, dog, acc, time = TestModel.TestModel(True, modelFile)
 			results_writer.writerow([i * epochs, cat, dog, acc, time])
 
@@ -65,28 +55,30 @@ def TrainAndTest(epochs, iterations, model, resultsCsv):
 			PerE_file.flush()
 			results_file.flush()
 
+
+
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(
 		description='Train a model and test along the way')
 
 	parser.add_argument('--epochs',
-	                    type=int,
-	                    default=5,
-	                    help='Number of epochs to train during each iteration')
+						type=int,
+						default=10,
+						help='Number of epochs to train during each iteration')
 
 	parser.add_argument('--iterations',
-	                    type=int,
-	                    default=500,
-	                    help='Number of iterations to train for the '
-	                         'number of epochs and test')
+						type=int,
+						default=100,
+						help='Number of iterations to train for the '
+							 'number of epochs and test')
 
 	parser.add_argument('--model',
-	                    type=str,
-	                    help='Model file to continue training with')
+						type=str,
+						help='Model file to continue training with')
 
 	parser.add_argument('--outputCsv',
-	                    type=str,
-	                    help='CSV file to output file to')
+						type=str,
+						help='CSV file to output file to')
 
 	args = parser.parse_args()
 

@@ -16,7 +16,7 @@ def BuildModel(epochs, model=None):
     Build the classifier model
     :param: epochs - number of epochs to train for
     :param: model - model file, if exists, to load and continue training
-    :return: Keras training history
+    :return: tuple (keras history, str) Keras training history, model file string
     """
 
     from keras import models
@@ -152,7 +152,7 @@ def BuildModel(epochs, model=None):
     #PlotTrainingAccuracy(history)
     #PlotTrainingLosses(history)
 
-    return history
+    return history, modelFile
 
 
 def PlotTrainingAccuracy(history):
