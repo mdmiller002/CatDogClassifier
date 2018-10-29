@@ -2,13 +2,16 @@
 Train and test a model incrementally
 """
 
-import BuildModel
-import TestModel
+
 import csv
 import argparse
 
 
 def TrainAndTest(epochs, iterations, model, resultsCsv):
+
+	import BuildModel
+	import TestModel
+
 	print('iterations:'+str(iterations)+'\tEpochs:'+str(epochs))
 	modelFile = 'newModel.h5'
 	writeMode = 'w'
