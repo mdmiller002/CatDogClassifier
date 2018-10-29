@@ -47,6 +47,8 @@ def TestModel(modelIsFile, model):
     for root, dirs, files in os.walk(testDirectory):
         for imgFile in files:
             if imgFile.endswith('.jpg'):
+                print('*', end='')
+                sys.stdout.flush()
 
                 # Run the inference on the image
                 imgPath = os.path.join(root, imgFile)
