@@ -130,7 +130,7 @@ def BuildModel(epochs, model=None):
     checkpointCb = ModelCheckpoint(modelFile,
                                    monitor='val_acc',
                                    verbose=1,
-                                   save_best_only=False,
+                                   save_best_only=True,
                                    mode='max')
 
     # saves the last epoch's to a file in case of keyboard interrupt
