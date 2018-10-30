@@ -21,6 +21,7 @@ def BuildModel(epochs, model=None):
 
     from keras import models
     from keras import layers
+    from keras import regularizers
     from keras.preprocessing.image import ImageDataGenerator
     from keras.callbacks import ModelCheckpoint,CSVLogger
 
@@ -50,31 +51,37 @@ def BuildModel(epochs, model=None):
 
         # Stage 1 convolutions and max-pooling
         classifier.add(layers.Conv2D(32, (3, 3), input_shape=inputShape))
-        #classifier.add(layers.Conv2D(32, (3, 3), activation='relu'))
-        classifier.add(layers.BatchNormalization())
+        #classifier.add(layers.BatchNormalization())
         classifier.add(layers.Activation('relu'))
+
+        #classifier.add(layers.Conv2D(32, (3, 3), kernel_regularizer=regularizers.l2()))
+        #classifier.add(layers.BatchNormalization())
+        #classifier.add(layers.Activation('relu'))
+
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
+        """
         # Stage 2 convolutions and max-pooling
-        classifier.add(layers.Conv2D(64, (3, 3)))
+        classifier.add(layers.Conv2D(64, (3, 3), kernel_regularizer=regularizers.l2()))
         #classifier.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        classifier.add(layers.BatchNormalization())
+        #classifier.add(layers.BatchNormalization())
         classifier.add(layers.Activation('relu'))
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
         # Stage 3 convolutions and max-pooling
-        classifier.add(layers.Conv2D(64, (3, 3)))
+        classifier.add(layers.Conv2D(64, (3, 3), kernel_regularizer=regularizers.l2()))
         #classifier.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        classifier.add(layers.BatchNormalization())
+        #classifier.add(layers.BatchNormalization())
         classifier.add(layers.Activation('relu'))
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
+        """
 
         # Flatten for the fully connected layers
         classifier.add(layers.Flatten())
 
         # Fully connected layer
-        classifier.add(layers.Dense(units=512))
-        classifier.add(layers.BatchNormalization())
+        classifier.add(layers.Dense(units=256))
+        #classifier.add(layers.BatchNormalization())
         classifier.add(layers.Activation('relu'))
         classifier.add(layers.Dropout(0.5))
 
