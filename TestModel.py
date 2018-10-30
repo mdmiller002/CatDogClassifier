@@ -43,6 +43,11 @@ def TestModel(modelIsFile, model):
     correctDogGuesses = 0
     numDogGuesses = 0
 
+    if Config.imgChannels == 1:
+        colorMode = 'grayscale'
+    else:
+        colorMode = 'rgb'
+
     # Run inferences on all images in the testing directory
     for root, dirs, files in os.walk(testDirectory):
         for imgFile in files:
@@ -51,16 +56,12 @@ def TestModel(modelIsFile, model):
                 # Run the inference on the image
                 imgPath = os.path.join(root, imgFile)
                 start = time.time()
-                #img = cv2.imread(imgPath)
-                #if Config.imgChannels == 1:
-                #    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                #img = cv2.resize(img, (Config.imgRows, Config.imgCols))
-                #img = np.reshape(img, [1, Config.imgRows, Config.imgCols, Config.imgChannels])
                 img = image.load_img(imgPath,
                                      target_size=(Config.imgRows, Config.imgCols),
-                                     color_mode='grayscale')
+                                     color_mode=colorMode)
                 img = image.img_to_array(img)
                 img = np.expand_dims(img, axis=0)
+                img = np.multiply(1./255, img)
                 result = classifier.predict_classes(img)
                 end = time.time()
 
