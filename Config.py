@@ -5,4 +5,4 @@ that are used across files
 
 imgRows = 200
 imgCols = 200
-imgChannels = 1
+imgChannels = 3

@@ -3,7 +3,7 @@ This module tests the model built via BuildModel
 """
 
 import numpy as np
-#import cv2
+# import cv2
 import os
 import sys
 import time
@@ -13,7 +13,6 @@ import argparse
 
 
 def TestModel(modelIsFile, model):
-
     """
     Test a model
     :param modelIsFile: Boolean, if the model is a file. If it isn't,
@@ -35,7 +34,6 @@ def TestModel(modelIsFile, model):
     else:
         classifier = model
 
-
     # Track average times, and cat & dog accuracy
     times = []
     correctCatGuesses = 0
@@ -43,24 +41,30 @@ def TestModel(modelIsFile, model):
     correctDogGuesses = 0
     numDogGuesses = 0
 
+    if Config.imgChannels == 1:
+        colorMode = 'grayscale'
+    else:
+        colorMode = 'rgb'
+
     # Run inferences on all images in the testing directory
+    current_dir = 0
+    len_dirs = None
     for root, dirs, files in os.walk(testDirectory):
-        for imgFile in files:
+        previous_i = 0
+        if len_dirs == None:
+            len_dirs = len(dirs)
+        for i, imgFile in enumerate(files):
             if imgFile.endswith('.jpg'):
 
                 # Run the inference on the image
                 imgPath = os.path.join(root, imgFile)
                 start = time.time()
-                #img = cv2.imread(imgPath)
-                #if Config.imgChannels == 1:
-                #    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                #img = cv2.resize(img, (Config.imgRows, Config.imgCols))
-                #img = np.reshape(img, [1, Config.imgRows, Config.imgCols, Config.imgChannels])
                 img = image.load_img(imgPath,
                                      target_size=(Config.imgRows, Config.imgCols),
-                                     color_mode='grayscale')
+                                     color_mode=colorMode)
                 img = image.img_to_array(img)
                 img = np.expand_dims(img, axis=0)
+                img = np.multiply(1. / 255, img)
                 result = classifier.predict_classes(img)
                 end = time.time()
 
@@ -75,10 +79,17 @@ def TestModel(modelIsFile, model):
                     numDogGuesses += 1
 
                 times.append((end - start) * 1000)
-                print('*', end='')
-                sys.stdout.flush()
-    print()
 
+                current_i = (i / len(files)) * 100
+                if (current_i != previous_i):
+                    previous_i = current_i
+                    # broken, needs to account for other dirs
+                    sys.stdout.write('\rTesting dir %i of %i: %3.2f%% ' % (current_dir, len_dirs, previous_i))
+                    # print('*', end='')
+                    sys.stdout.flush()
+        current_dir += 1
+
+    print()
 
     # Calculate average accuracies and times of the runs
     accuracy = (correctCatGuesses + correctDogGuesses) / (numCatGuesses + numDogGuesses) * 100
@@ -94,9 +105,7 @@ def TestModel(modelIsFile, model):
     return catAccuracy, dogAccuracy, accuracy, averageTime
 
 
-
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser(
         description='Test a model')
 
