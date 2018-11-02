@@ -53,23 +53,22 @@ def BuildModel(epochs, model=None, timeStamp=None):
 
         # Stage 1 convolutions and max-pooling
         classifier.add(layers.Conv2D(32, (3, 3), input_shape=inputShape))
-        # classifier.add(layers.BatchNormalization())
         classifier.add(layers.Activation('relu'))
 
-        # classifier.add(layers.Conv2D(32, (3, 3), kernel_regularizer=regularizers.l2()))
-        # classifier.add(layers.BatchNormalization())
-        # classifier.add(layers.Activation('relu'))
+        classifier.add(layers.Conv2D(32, (3, 3)))
+        classifier.add(layers.Activation('relu'))
 
+        classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
+
+
+        # Stage 2 convolutions and max-pooling
+        classifier.add(layers.Conv2D(64, (3, 3)))
+        classifier.add(layers.Activation('relu'))
+        classifier.add(layers.Conv2D(64, (3, 3)))
+        classifier.add(layers.Activation('relu'))
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
         """
-        # Stage 2 convolutions and max-pooling
-        classifier.add(layers.Conv2D(64, (3, 3), kernel_regularizer=regularizers.l2()))
-        #classifier.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        #classifier.add(layers.BatchNormalization())
-        classifier.add(layers.Activation('relu'))
-        classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
-        
         # Stage 3 convolutions and max-pooling
         classifier.add(layers.Conv2D(64, (3, 3), kernel_regularizer=regularizers.l2()))
         #classifier.add(layers.Conv2D(64, (3, 3), activation='relu'))
