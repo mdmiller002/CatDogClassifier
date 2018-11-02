@@ -64,11 +64,7 @@ def TestModel(modelIsFile, model):
                                      color_mode=colorMode)
                 img = image.img_to_array(img)
                 img = np.expand_dims(img, axis=0)
-<<<<<<< HEAD
                 img = np.multiply(1. / 255, img)
-=======
-                img = np.multiply(1./255, img)
->>>>>>> 6c9bd9f03e9fdf335b41a14bba221788438cbbed
                 result = classifier.predict_classes(img)
                 end = time.time()
 

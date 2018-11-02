@@ -20,7 +20,6 @@ def BuildModel(epochs, model=None, timeStamp=None):
 
     from keras import models
     from keras import layers
-    from keras import regularizers
     from keras.preprocessing.image import ImageDataGenerator
     from keras.callbacks import ModelCheckpoint, CSVLogger
 
@@ -54,21 +53,12 @@ def BuildModel(epochs, model=None, timeStamp=None):
 
         # Stage 1 convolutions and max-pooling
         classifier.add(layers.Conv2D(32, (3, 3), input_shape=inputShape))
-<<<<<<< HEAD
         # classifier.add(layers.BatchNormalization())
         classifier.add(layers.Activation('relu'))
 
         # classifier.add(layers.Conv2D(32, (3, 3), kernel_regularizer=regularizers.l2()))
         # classifier.add(layers.BatchNormalization())
         # classifier.add(layers.Activation('relu'))
-=======
-        #classifier.add(layers.BatchNormalization())
-        classifier.add(layers.Activation('relu'))
-
-        #classifier.add(layers.Conv2D(32, (3, 3), kernel_regularizer=regularizers.l2()))
-        #classifier.add(layers.BatchNormalization())
-        #classifier.add(layers.Activation('relu'))
->>>>>>> 6c9bd9f03e9fdf335b41a14bba221788438cbbed
 
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
@@ -93,11 +83,7 @@ def BuildModel(epochs, model=None, timeStamp=None):
 
         # Fully connected layer
         classifier.add(layers.Dense(units=256))
-<<<<<<< HEAD
         # classifier.add(layers.BatchNormalization())
-=======
-        #classifier.add(layers.BatchNormalization())
->>>>>>> 6c9bd9f03e9fdf335b41a14bba221788438cbbed
         classifier.add(layers.Activation('relu'))
         classifier.add(layers.Dropout(0.5))
 
