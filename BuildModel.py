@@ -54,41 +54,43 @@ def BuildModel(epochs, model=None, timeStamp=None):
         # Stage 1 convolutions and max-pooling
         classifier.add(layers.Conv2D(32, (3, 3), input_shape=inputShape))
         classifier.add(layers.Activation('relu'))
-
-        classifier.add(layers.Conv2D(32, (3, 3)))
-        classifier.add(layers.Activation('relu'))
-
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
 
         # Stage 2 convolutions and max-pooling
-        classifier.add(layers.Conv2D(64, (3, 3)))
-        classifier.add(layers.Activation('relu'))
-        classifier.add(layers.Conv2D(64, (3, 3)))
+        classifier.add(layers.Conv2D(32, (3, 3)))
         classifier.add(layers.Activation('relu'))
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
-        """
+
         # Stage 3 convolutions and max-pooling
-        classifier.add(layers.Conv2D(64, (3, 3), kernel_regularizer=regularizers.l2()))
-        #classifier.add(layers.Conv2D(64, (3, 3), activation='relu'))
-        #classifier.add(layers.BatchNormalization())
+        classifier.add(layers.Conv2D(32, (3, 3)))
         classifier.add(layers.Activation('relu'))
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
-        """
+
+        # Stage 4 convolutions and max-pooling
+        classifier.add(layers.Conv2D(32, (3, 3)))
+        classifier.add(layers.Activation('relu'))
+        classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
+
+        # Stage 5 convolutions and max-pooling
+        classifier.add(layers.Conv2D(32, (3, 3)))
+        classifier.add(layers.Activation('relu'))
+        classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
+
+
 
         # Flatten for the fully connected layers
         classifier.add(layers.Flatten())
 
         # Fully connected layer
-        classifier.add(layers.Dense(units=256))
-        # classifier.add(layers.BatchNormalization())
+        classifier.add(layers.Dense(units=512))
         classifier.add(layers.Activation('relu'))
         classifier.add(layers.Dropout(0.5))
 
         # Output layer
         classifier.add(layers.Dense(units=1))
-        classifier.add(layers.Activation("hard_sigmoid"))
+        classifier.add(layers.Activation('sigmoid'))
 
         classifier.compile(optimizer='adam',
                            loss='binary_crossentropy',
@@ -107,18 +109,12 @@ def BuildModel(epochs, model=None, timeStamp=None):
         classifier = models.load_model(save_root + modelFile)
 
     # Augment training and tesing images
-    train_datagen = ImageDataGenerator(rescale=1. / 255,
+    train_datagen = ImageDataGenerator(rescale=(1./255),
                                        shear_range=0.2,
                                        zoom_range=0.2,
                                        horizontal_flip=True)
 
-    test_datagen = ImageDataGenerator(rescale=1. / 255)
-
-    # Create generators for training and testing data
-    if Config.imgChannels == 1:
-        colorMode = 'grayscale'
-    else:
-        colorMode = 'rgb'
+    test_datagen = ImageDataGenerator(rescale=(1./255))
 
     # Create generators for training and testing data
     if Config.imgChannels == 1:
