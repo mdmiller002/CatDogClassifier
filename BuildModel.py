@@ -78,6 +78,12 @@ def BuildModel(epochs, model=None, timeStamp=None):
         classifier.add(layers.Activation('relu'))
         classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
 
+        # Stage 6 convolutions and max-pooling
+        classifier.add(layers.Conv2D(32, (3, 3)))
+        classifier.add(layers.Activation('relu'))
+        classifier.add(layers.MaxPooling2D(pool_size=(2, 2)))
+
+
 
 
         # Flatten for the fully connected layers
